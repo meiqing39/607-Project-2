@@ -1,0 +1,22 @@
+---
+title: "DATA 607 - Project #2"
+author: "Denise Atherley"
+format: html
+editor: visual
+---
+
+## Approach
+
+For this project, I reviewed the discussion entries from "Discussion 5A: Untidy Data" and found an entry by Qingquan Li that I found compelling. He included an untidy data set found on wikipedia that listed different countries and their projected GDP over several years. The data started with estimates from the 1970s all the way to present day and included projections into the year 2030.
+
+### Tidying strategy:
+
+For this project I will work specifically with the data from 2020 to 2030. To accomplish this, I took the raw data from the wikipedia page and created a .csv file that preserved the wide format that it is in. I then loaded the .csv file into my github repository so that I can reference it in RStudio.
+
+A copy of this data can be found in this public repository: [Countries GDP (github repository)](https://github.com/meiqing39/607-Project-2/blob/main/List%20of%20Countries%20by%20Past%20and%20Projected%20GDP.csv)
+
+### Analysis strategy:
+
+I will use a combination of tidyr and dplyr to tidy and transform the data. Once the data is in long format, I will then compare the GDP growth trajectories over time and summarize the average growth rate to see which global economy has the highest growth rate and which has the lowest. In addition, I will also use ggplot2 to visualize the GDP change over time and across the top 5 countries.
+
+I suspect that I will be challenged with some of the code needed to properly tidy the data as well as the best code to use to visualize the information, so I will use the assistance of Google Gemini to help expand and iterate on my code.
