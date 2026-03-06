@@ -1,2 +1,3 @@
 # 607-Project-2
-Working in a group to clean and analyze 3 wide data set Approach and Codebase
+This project was completed collaboratively with Desire Thomas, Kiera Griffiths, Mei Qi Ng and Denise A.
+3 wide dataset was collected. Each is cleaned and each dataset is analyzed independently as required by the assignment.
