@@ -1,0 +1,32 @@
+---
+title: "Project_2 Powerlifting"
+author: "Mei Qi Ng"
+format: html
+editor: visual
+---
+
+## Approach
+
+One of the dataset used for project comes from the Open Powerlifting Database on Kaggle, which has competition results across federations, weight classes, and events. Although the dataset is readable, it is not in tidy format. There are several structural issues make it untidy: it is a wide format storage: contains many variables spread across many columns. Also the multiple observation unit in 1 row need to be extended.
+
+## Tidying Strategy:
+
+(1) First I will load the csv file that is uploaded from the Github repository.
+
+To transform this dataset into tidy format, I will:
+
+(2 ) Identify wide-format columns specifically columns and place the multiple variables in a single name.Reshape from wide to long format. I plan to collapse the many columns into 2 new columns that I will rename.
+
+Challenges would be that there are missing and inconsistent values (0 or DF) as some competitors may not have attempted all lifts but that will be documented and how these cases are handled. Address missing or inconsistent values For example:
+
+## Planned Analyses
+
+After tidying is complete, I plan to perform several analyses based on the tidy dataset:
+
+(1) Performance differences by sex: Use boxplots to compare lift performance between male and female competitors.
+
+(2) Lift strength relative to body weight: Group by weight class to examine strength differences and compare.
+
+(3) Trends over time: Analyzing maximum recorded lifts across years to observe how world-record-level lifts have progressed.
+
+Finally, data visualizations will be created using ggplot2, and results will be summarized in tables with clear labeling.
