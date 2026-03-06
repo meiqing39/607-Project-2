@@ -1,0 +1,9 @@
+---
+title: "Project 2- Data Tidying"
+author: "Kiera Griffiths, Desiree Thomas"
+format: html
+editor: source
+---
+
+# Approach 
+For Project 2, we will be tidying 3 datasets. This file focuses on the Generational Takeout Spending dataset. We will import the wide-format CSV file from GitHub into R and transform it into a tidy structure using the tidyr and dplyr packages. We will reshape the generational spending columns into a long format using functions such as pivot_longer(), then standardize column names with rename_with() and handle any missing or inconsistent values using functions like drop_na() to prepare the data for analysis. Finally, we will analyze trends in takeout spending across generations and visualize the results using ggplot2, though a potential challenge may be restructuring the generational columns correctly during the wide-to-long transformation.
