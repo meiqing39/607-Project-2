@@ -1,6 +1,6 @@
 ---
 title: "Project 2- Data Tidying"
-author: "Kiera Griffiths, Desiree Thomas"
+author: "Kiera Griffiths, Desiree Thomas, "
 format: html
 editor: source
 ---
@@ -12,6 +12,7 @@ For Project 2, we will be tidying 3 datasets. This file focuses on the Generatio
 library(tidyr)
 library(dplyr)
 library(ggplot2)
+library(gt)
 ```
 
 # Data Source
@@ -32,24 +33,24 @@ We reshaped the dataset from wide to tidy (long) format. We normalized variable 
 
 tidy_gen_takeout <- generational_takeout %>%
   
-  # Step 1: Reshape from wide to long (tidy) format
+  # Reshape from wide to long (tidy) format
   pivot_longer(
     cols = -Generation,       # all columns except 'Generation'
     names_to = "period",      # column names (Jan.25, Feb.25...) go into 'period'
     values_to = "expenses"    # values go into 'expenses'
   ) %>%
  
-  # Step 2: Split 'period' into month and year, this is part of the normalization process.
+  # Split 'period' into month and year, this is part of the normalization process.
   #\\. is used to escape the '.' and prevent an error in the separate() function; '.' on it's own is a wildcard character 
   separate(period, into = c("month", "year"), sep = "\\.") %>%
  
-   # Step 3: Standardize year to 4 digits and convert Generation to factor
+   # Standardize year to 4 digits and convert Generation to factor
   mutate(
     year = paste0("20", year),
     Generation = as.factor(Generation)
   ) %>%
  
-   # Step 4: Standardize column names manually
+   # Standardize column names manually
   rename(
     generation = Generation
   )
@@ -71,9 +72,14 @@ gen_monthly_percentage <- tidy_gen_takeout %>%
   mutate(total_month = sum(expenses)) %>%  # total spending across all generations per month
   ungroup() %>%
   mutate(percent = round((expenses / total_month) * 100)) %>%  # round to whole %
-  select(generation, month, expenses, percent)
+  select(month, generation, expenses, percent) %>%
+  arrange(match(month, c("Jan","Feb","Mar","Apr","May","Jun")), generation)
 
-gen_monthly_percentage
+gen_monthly_percentage %>%
+  mutate(
+    expenses = paste0("$", expenses),
+    percent = paste0(percent, "%")
+  )
 ```
 ```{r}
 # Month order
@@ -98,47 +104,61 @@ ggplot(gen_monthly_percentage, aes(x = month, y = percent, fill = generation)) +
 ```
 
 ```{r}
-library(gt)
 
-# 1️⃣ Prepare summary table: months as rows, generations as columns
+# Prepare summary table: months as rows, generations as columns
 summary_table <- gen_monthly_percentage %>%
   select(month, generation, percent) %>%
   pivot_wider(names_from = generation, values_from = percent) %>%
   arrange(match(month, c("Jan","Feb","Mar","Apr","May","Jun")))
 
-# 2️⃣ Create styled summary chart with gt
+# Create styled summary chart
 summary_table %>%
   gt() %>%
   tab_header(
-    title = "Generational Percentages per Month"
+    title = "Generational Percentages per Month (%)"
   ) %>%
-  # 3️⃣ Add alternating row colors
-  tab_style(
-    style = list(
-      cell_fill(color = "lightgray")
-    ),
-    locations = cells_body(
-      rows = seq(1, nrow(summary_table), 2)  # every other row
-    )
+  cols_label(
+    month = "Month"
   ) %>%
-  # 4️⃣ Optional: center-align text
   cols_align(
     align = "center",
     columns = everything()
+  ) %>%
+  cols_align(
+    align = "left",
+    columns = month
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = month
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "lightgray"),
+    locations = cells_body(
+      rows = seq(1, nrow(summary_table), 2)
+    )
   )
 ```
 
 ```{r}
 generational_analysis <- tidy_gen_takeout %>%
 
-# 3. Target: Group by Generation
+# Group by Generation
   group_by(generation) %>%
 
-# 4. Focus: Calculate the Average spending across the months
+# Calculate the average spending across the months
   summarise(avg_monthly_spending = round(mean(expenses))) %>%
   
-# 5. Rank: Order from highest to lowest
-  arrange(desc(avg_monthly_spending))
+# Order from highest to lowest
+  arrange(desc(avg_monthly_spending)) 
+
+# Add $ to amounts only in presentation, as not to chnage the character structure.
+  generational_analysis  %>%
+  mutate(
+    avg_monthly_spending = paste0("$", avg_monthly_spending)
+  )
  
 # View the final ranked results
 print(generational_analysis)
@@ -146,15 +166,13 @@ print(generational_analysis)
 
 ```{r}
 
-library(ggplot2)
-
 ggplot(generational_analysis, 
        aes(x = reorder(generation, avg_monthly_spending),
            y = avg_monthly_spending, 
            fill = generation)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = paste0("$", avg_monthly_spending)),
-            vjust = -0.5, size = 4) +
+            vjust = -0.5, size = 3.8) +
   labs(
     title = "Average Monthly Takeout Spending by Generation",
     x = "Generation",
@@ -167,12 +185,15 @@ ggplot(generational_analysis,
 ```
 
 ```{r}
-library(gt)
 
 generational_analysis %>%
   gt() %>%
   tab_header(
     title = "Average Monthly Takeout Spending by Generation"
+  ) %>%
+  cols_label(
+    generation = "Generation",
+    avg_monthly_spending = "Monthly Average ($)"
   ) %>%
   cols_align(
     align = "center",
@@ -186,3 +207,12 @@ generational_analysis %>%
   )
 ```
 
+# Conclusion
+
+After transforming the dataset from wide to tidy, we performed two analyses: the generational percentage of total monthly spending and the average monthly spending by generation. 
+
+The generational percentage of total monthly spending analysis shows Millennials account for the largest share of each month's takeout spending, ranging from 29–30%. Gen X and Gen Z spend almost identical shares each month, at 23-24% and 22-23%, respectively. And as the older generations, Baby Boomers only account for 15%, while the Silent Generation stays at 9-10%, each month.
+
+The average monthly spending analysis by generation supports these findings by showing Millennials spend the most, with an average monthly takeout expenditure of approximately \$257, followed by Gen X at \$206 and Gen Z at roughly \$199. Baby Boomers were in fourth with an average of \$131, while the Silent Generation had the lowest monthly average at \$82 per month, \$175 less, per month, than the highest spender. 
+
+Overall, the analyses presented in the visualizations and summary tables highlight multiple generational differences in spending behavior. Approximately 75% of monthly takeout spending is done by the younger three generations, though Millenials, who are in the middle of the three, account for 30%, a disproportionately large amount. The data also shows an interesting trend where Gen X and Gen Z are spending almost on par each month, though there's a generation between them. Gen X is often the parent of Gen Z, so it could be informative to explore their spending habits deeper. The older generations, Baby Boomers and the Silent Generation spending the lowest amounts was expected though. 
