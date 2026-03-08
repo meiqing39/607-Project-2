@@ -1,0 +1,197 @@
+---
+title: "Project_2 Powerlifting"
+author: "Mei Qi Ng"
+format: html
+editor: visual
+---
+
+## Approach
+
+One of the dataset used for project comes from the Open Powerlifting Database on Kaggle, which has competition results across federations, weight classes, and events. Although the dataset is readable, it is not in tidy format. There are several structural issues make it untidy: it is a wide format storage: contains massive amounts of variables spread across many columns. Also the multiple observation unit in 1 row need to be extended.
+
+## Tidying Strategy:
+
+(1) First I will load the csv file that is uploaded from the Github repository.
+
+**To transform this dataset into tidy format, I will:**
+
+(2) Identify wide-format columns specifically columns and place the multiple variables in a single name.Reshape from wide to long format. I plan to collapse the many columns into 2 new columns that I will rename.
+
+Challenges would be working with such a large and wide dataset and also the missing and inconsistent values (0 or negatives) as some competitors may not have attempted all lifts or failed attempt lifts but that will be documented and how these cases are handled.
+
+## Planned Analyses
+
+After tidying is complete, I plan to perform several analyses based on the tidy dataset:
+
+(1) **Performance differences by sex:** Use boxplots to compare lift performance between male and female competitors.
+
+(2) **Lift strength relative to body weight:** Group by weight class to examine strength differences and compare.
+
+(3) **Trends over time:** Analyzing maximum recorded lifts across years to observe how world-record-level lifts have progressed.
+
+Finally, data visualizations will be created using ggplot2, and results will be summarized in tables with clear labeling.
+
+**Resources:**
+
+-   [R for Data Science 2nd Editio](https://r4ds.hadley.nz/)n
+
+-   [Kaggle: Open Powerlifting Data Set](https://www.kaggle.com/datasets/open-powerlifting/powerlifting-database?resource=download)
+
+-   Google. (2026). \*Gemini\* \[Large language model\]. https://gemini.google.com. Accessed March 7th, 2026
+
+
+# **Loading packages and data set**
+
+```{r}
+library (tidyverse) #loads required packages needed for data manipulation such as dplyr, tidyr, readr, lubridate and ggplot2
+
+#Gemini LLM assisted me in loading such a large csv file onto Github repository using Git
+#loading url from github zip link for large csv file
+github_url <- "https://raw.githubusercontent.com/meiqing39/607-Project-2/cbb74bb1c84cef741f9883e92b32ce21ef7078db/openpowerlifting.zip"
+
+# Create a temporary file on the user's computer
+temp_file <- tempfile(fileext = ".zip")
+
+# Download the file safely
+download.file(github_url, destfile = temp_file, mode = "wb")
+
+# Read the data into R
+raw_powerlifting <- read_csv(temp_file)
+
+# Display the structure
+
+glimpse(raw_powerlifting)
+
+```
+
+# **Reshaping and tidy large data**
+
+```{r}
+#wide to long format and use columns that shows competitors attempts
+tidy_powerlift <- raw_powerlifting |> 
+  pivot_longer(cols = matches("Squat|Bench|Deadlift)[1-4]Kg"),
+               names_to = "lift_type",
+               values_to = "lift_kg") |> 
+  #everything to lowercase, easier to work with and consistent, remove missing values and negative values (failed lifts)
+  rename_with(tolower) |> 
+  drop_na(lift_kg) |> 
+  filter(lift_kg >0)  #keep successful lifts
+ 
+glimpse(tidy_powerlift)
+```
+
+# **Narrowing down to a smaller dataset: USA**
+
+```{r}
+#Filtering to work with USA powerlifting competitors and specifc columns
+
+tidy_USA_powerlift <- tidy_powerlift |> 
+  filter(country == "USA") |> 
+   select(name, sex, age, bodyweightkg,country,date,lift_type, lift_kg)
+
+glimpse(tidy_USA_powerlift) #look at total columns
+
+head(tidy_USA_powerlift, 6) #look at first 6 rows 
+
+```
+
+## **Analyses: Performance differences, Lift strength, Trends**
+
+# **Analysis 1: Performance difference (Male vs Female)**
+
+```{r}
+
+#Performance difference by Sex Table
+
+PxS_table <-tidy_USA_powerlift |> 
+  filter(sex %in% c("M", "F")) |> 
+  group_by(sex, lift_type) |> 
+  summarize(avg_lift = round(mean(lift_kg), 0),
+            max_lift = max(lift_kg))
+
+print(PxS_table)
+
+
+# Compare lifts between sex: Boxplot 
+
+tidy_USA_powerlift |> 
+  filter(sex %in% c("M", "F")) |> 
+  ggplot(aes( x = sex, y = lift_kg, fill = sex))+
+  geom_boxplot()+
+  facet_wrap(~lift_type)+ #compare all kinds of lifts
+  labs( title = "Lift Perfomance Differences between Sex",
+        x = "Sex",
+        y = "Weight lifted (kg)")
+```
+
+**Interpretation: The table and the box plot shows the performance differences between Male vs Female weight lifting competitors across 3 different weight lifting events. I expected male lifters to lift heavier on average and in max lifting than females in the all lifting events. This was revealed clearly in the boxplot. In additon, there is also a larger variance in strength level for male competitors than females; it is more apparent in the Squat competitions.**
+
+# **Analysis 2: lift strength relative to body weight**
+
+```{r, warning = FALSE, message = FALSE}
+#How many times their own body weight can a powerlifter competitor lift?
+
+strength_table <- tidy_USA_powerlift |> 
+  filter(sex %in% c("M", "F")) |>
+  mutate(bw_multiplier = lift_kg/bodyweightkg) |> 
+  group_by(sex, lift_type) |> 
+  summarize(avg_times = round(mean(bw_multiplier, na.rm = TRUE), 0))
+            
+print(strength_table)
+
+# Scatterplot to compare body weight of competitors to how much weight they can lift
+
+tidy_USA_powerlift|> 
+  filter(sex %in% c("M", "F")) |> 
+  ggplot(aes( x = bodyweightkg, y = lift_kg, color = sex))+
+  geom_point(alpha = 0.2)+ # create transparent dots to see clusters of M vs F more clearly
+  facet_wrap(~lift_type)+   
+  labs(title = "Lift Strength to Body Weight",
+       x = "Competitor Weight (kg)",
+       y = "Weight lifted (kg)")
+```
+
+**Intepretation: When analyzing the lift strength to the competitor's body weight, the scatter plot demonstrates a positive correlation of increase lifter's body weight mean increase weight that they can lift. However, the table provides more information by calculating the average bodyweight multiplier. This is incredibly interesting to see and compare: while heavier power lifters lift more total weight, lighter power lifters often move a higher multiple of their own body weight which reveals very strong relative strength to their weight.**
+
+# **Analysis 3: Trend over time**
+
+```{r}
+# Trend table
+
+TT_table <- tidy_USA_powerlift |> 
+  mutate(year = lubridate::year(date)) |>
+  group_by(year, lift_type) |>
+  summarize(max_lift = max(lift_kg)) |> 
+  arrange(desc(year))
+
+head(TT_table, 9)
+
+
+# Extract Year and find max lift per year
+
+tidy_USA_powerlift|> 
+  mutate(year = lubridate::year(date)) |> #extracts date/time *R for datascience Chapter 17*
+  group_by(year, lift_type)|> 
+  summarize(max_weight_lift = max(lift_kg)) |> 
+  ggplot(aes( x = year, y = max_weight_lift, color = lift_type))+
+  geom_line()+
+  labs(title = "Competition Max Lifts over Time",
+       x = "Year",
+       y = "Lift Type")
+```
+
+**Interpretation:** By extracting the year from the competition dates, we can track the progression of the highest weight lifted by the power lifters. The line graph and table shows the maximum lifts over the years. I can see how power lifters in the US attempts in all lift type are trending upwards which makes sense since for these althetes over the years with experience, they probably made improvements in their training methods, nutrition,and using better lifting equipment.
+
+# Conclusion
+
+The goal of this project was to transform a wide, untidy dataset into a tidy format that can be used for analysis. By using the pivot_longer() function in tidyr, the OpenPowerlifting dataset was successfully reshaped, collapsing over a dozen horizontal lift attempt columns into standardized lift_type and lift_kg variables. The challenge for me was trying to find a way to upload this large csv data set probably as Github would not accept files larger than 100MB. By using Gemini Pro as a assistant, I was able to bypass this by zip filing and using Git Bash to push and commit the csv file on to the main repository. In additon, while working with such a large datase, I notice there were many missing and failed (negative values) attempts. By using the drop.na functions and filtering those values out, as well as selecting only the variable columns I am interested in, I was able to create a clean dataset that was ready to be utilized for exploratory planned analyses.
+
+Working on the tidy data, the analysis I performed regarding the powerlifting listed:
+
+Performance Differences (Sex): There is apparent variance in strength between sexes, with males recording higher average lifts across all events (ex: an average bench(1kg) of 162 kg compared to 76 kg for females).
+
+Strength to bodyweight: While weight lifted increases with body weight as I predicted, I analyzed the bodyweight multiplier and it revealed that lighter lifters often have exceptional strength, moving higher multiples of their own body weight.
+
+Trends over time: There is a clear upward trajectory of the maximum lifts over the years in the power lifting sport in the USA competition, which reflects the advancements in strength training and athlete preparation.
+
+Ultimately, this process help me understand how important data tidying was when using a large and messy data set. The wide format made creating tables and data plot visualizations very difficult as there were too many variables to work with. However, the tidy and long format allowed for better statistical grouping, easier spotting of patterns in the tables, and creating straight forward graphs.
