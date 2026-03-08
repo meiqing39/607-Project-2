@@ -1,0 +1,194 @@
+---
+title: "DATA 607 - Project #2"
+author: "Denise Atherley"
+format: html
+editor: visual
+---
+
+## Approach
+
+For this project, I reviewed the discussion entries from "Discussion 5A: Untidy Data" and found an entry by Qingquan Li that I found compelling. He included an untidy data set found on Wikipedia that listed different countries and their projected GDP over several years. The data started with estimates from the 1970s all the way to present day and included projections into the year 2030.
+
+### Tidying strategy:
+
+For this project I will work specifically with the data from 2020 to 2030. To accomplish this, I took the raw data from the Wikipedia page and created a .csv file that preserved the wide format that it is in. I then loaded the .csv file into my github repository so that I can reference it in RStudio.
+
+A copy of this data can be found in this public repository: [Countries GDP (github repository)](https://github.com/meiqing39/607-Project-2/blob/main/List%20of%20Countries%20by%20Past%20and%20Projected%20GDP.csv)
+
+### Analysis strategy:
+
+I will use a combination of tidyr and dplyr to tidy and transform the data. Once the data is in long format, I will then compare the GDP growth trajectories over time and summarize the average growth rate to see which global economy has the highest growth rate and which has the lowest. In addition, I will also use ggplot2 to visualize the GDP change over time and across the top 5 countries and the bottom 5 countries.
+
+### LLM support and enhancement
+
+I suspect that I will be challenged with some of the code needed to properly tidy the data as well as the best code to use to visualize the information, so I will use the assistance of Google Gemini to help expand and iterate on my code.
+
+*AI citation -*
+
+*(Google DeepMind. (2026). Gemini Pro \[Large language model\].*
+
+[*https://gemini.google.com*](https://gemini.google.com)*. Accessed March 8, 2026*
+
+## Code Deliverable -
+
+I ensure that I am able to use tidyverse syntax in my code by loading the necessary packages.
+
+```{r}
+library (tidyverse)
+```
+
+### Load and Preview data
+
+I examine the information by loading the data and then previewing the top 6 rows.
+
+```{r}
+#| echo: true
+
+# Import dataset into R from github repository
+gdp_data<- read.csv("https://raw.githubusercontent.com/meiqing39/607-Project-2/refs/heads/main/List%20of%20Countries%20by%20Past%20and%20Projected%20GDP.csv")
+
+# Preview data to understand its structure
+head(gdp_data)
+
+
+```
+
+### Data transformation
+
+I will transform the data from wide format to long format and will rename my variables to follow a more consistent naming convention. I will also normalize the variable structure to ensure that the GDP values and Years are numeric in format and the Country names don't have any leading or trailing spaces. My data has several records with missing values for past or future GDP projections, so to ensure that this doesn't affect my analysis later on, I will drop rows containing null values in the 'GDP' column.
+
+```{r}
+#| echo: true
+tidy_gdp <- gdp_data %>%
+  
+  # 1. Rename variables to follow a consistent naming convention
+  rename(Country = `Country...territory`) %>%
+  
+  # 2. Reshape from wide to tidy (long) format
+  # The dataset has years (2020 to 2030) as separate columns (wide format).
+  # I will use pivot_longer to melt all columns EXCEPT 'Country' into two columns:
+  # 'Year' and 'GDP'.
+  pivot_longer(
+    cols = -Country,         
+    names_to = "Year",       
+    values_to = "GDP"        
+  ) %>%
+  
+  # 3. Normalize variable structure
+   mutate(
+    GDP = as.numeric(str_remove_all(GDP, ",")),
+    Year = as.numeric(str_remove_all(Year, "X")),
+    Country = str_trim(Country)
+  ) %>%
+  
+  # 4. Address missing or inconsistent values by dropping the rows with null values
+  drop_na(GDP)
+
+# View the final, tidy dataset
+print(tidy_gdp)
+```
+
+## Analysis
+
+To compare the GDP growth trajectories over time and summarize the average growth rate to see which global economy has the highest growth rate and which has the lowest, I will need to use the Compound Annual Growth Rate (CAGR). I will calculate the average annual growth rate from the earliest year to the latest available year for each country to accomplish this.
+
+```{r}
+#| echo: true
+# Calculate the Compound Annual Growth Rate (CAGR) for each country
+gdp_summary <- tidy_gdp %>%
+  group_by(Country) %>%
+  # Filter to just the start and end years for each country
+  filter(Year == min(Year) | Year == max(Year)) %>%
+  arrange(Year) %>%
+  summarize(
+    Start_Year = first(Year),
+    End_Year = last(Year),
+    Start_GDP = first(GDP),
+    End_GDP = last(GDP),
+    Years = End_Year - Start_Year,
+    # Formula for CAGR: (End Value / Start Value)^(1 / Years) - 1
+    CAGR = ((End_GDP / Start_GDP) ^ (1 / Years)) - 1,
+    .groups = "drop"
+  ) %>%
+  # Remove countries with only 1 year of data to avoid dividing by zero
+  filter(Years > 0)
+```
+
+I will now extract the top 5 countries with the highest growth and the bottom 5 countries with the lowest growth, combine them into one table for analysis and view them in a formatted summary table.
+
+```{r}
+#| echo: true
+library(scales) # for formatting percents
+
+# Extract the Top 5 (highest growth) and Bottom 5 (lowest growth) economies
+top_5 <- gdp_summary %>% arrange(desc(CAGR)) %>% head(5)
+bottom_5 <- gdp_summary %>% arrange(CAGR) %>% head(5)
+
+# Combine into one table for analysis
+extreme_gdp <- bind_rows(top_5, bottom_5)
+
+# View the formatted summary table
+extreme_gdp %>%
+  select(Country, Start_Year, End_Year, Start_GDP, End_GDP, CAGR) %>%
+  mutate(CAGR = percent(CAGR, accuracy = 0.1)) %>%
+  print()
+```
+
+### Interpretation of Summary Table
+
+The summary table exposes stark contrasts in global economic trajectories. **Guyana** holds the highest average growth rate by a massive margin (\~22% annually). This reflects unprecedented real-world economic expansion largely driven by massive offshore oil discoveries that recently entered production (*source*: <https://www.cfr.org/articles/how-guyanas-oil-boom-will-reshape-energy-security>). Conversely, **Zimbabwe** shows the steepest projected contraction (-16.8% annually) within this dataset due to droughts and floods that affected agricultural output and higher costs of fuel and food imports (*source:* [https://www.afdb.org/en/countries/southern-africa/zimbabwe/zimbabwe-economic-outlook](#0)). Advanced economies like **Japan** sit near the bottom with flat line growth (+0.1%), illustrating long-term economic consistency.
+
+### Visualizing the data
+
+I will set up a bar chart that will compare the highest CAGR to the lowest CAGR.
+
+```{r}
+#| echo: true
+# 1. Bar Chart of Highest and Lowest Growth Rates
+ggplot(extreme_gdp, aes(x = reorder(Country, CAGR), y = CAGR, fill = CAGR > 0)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(values = c("TRUE" = "#2E8B57", "FALSE" = "#CD5C5C")) +
+  labs(
+    title = "Highest and Lowest Global Economies by Average Annual GDP Growth",
+    subtitle = "Compound Annual Growth Rate (CAGR) from 2020 to latest projection",
+    x = "Country",
+    y = "Average Annual Growth Rate (CAGR)",
+    fill = "Positive Growth"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Comparing the absolute GDP values of giant economies, like Japan, against tiny ones, like Guyana on the same graph makes the graph unreadable, I will "index" the GDP by setting every country's 2020 GDP to a baseline of "100". This will help me fairly compare their trajectories over time.
+
+```{r}
+# 2. Line Chart of Trajectories (Indexed to Start Year)
+trajectory_data <- tidy_gdp %>%
+  filter(Country %in% extreme_gdp$Country) %>%
+  group_by(Country) %>%
+  # Index GDP so the starting year for every country equals 100
+  mutate(GDP_Index = (GDP / first(GDP)) * 100) %>%
+  ungroup()
+
+ggplot(trajectory_data, aes(x = Year, y = GDP_Index, color = Country)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  labs(
+    title = "GDP Growth Trajectories (Indexed: Start Year = 100)",
+    subtitle = "Comparing the 5 fastest and 5 slowest growing economies",
+    x = "Year",
+    y = "GDP Index (Base 100)",
+    color = "Country"
+  ) +
+  theme_minimal()
+```
+
+### Interpretation of Visualizations
+
+The bar chart makes it immediately obvious how significantly the top 5 emerging economies outpace the bottom 5. Meanwhile, the indexed trajectory line chart highlights just how aggressively Guyana breaks the mold. While most countries hover gently around the "100" baseline index, Guyana’s trajectory rockets vertically. By 2030, Guyana's GDP is projected to be nearly **750%** of what it was in 2020, visually confirming its status as the world's most rapidly expanding economy. Conversely, Zimbabwe's sharp downward slope reveals a severe projected collapse in GDP value over the same decade.
+
+## Conclusion
+
+The process of transforming the data from wide format to long format was facilitated with the use of the LLM Google Gemini. It explained to me the steps to take to normalize the variables and I was able to expand on the provided code the LLM gave me by examining my data and testing each part on my own as well as modifying slightly the variable names. Once I isolated the top 5 and bottom 5 economies in a summary table, I was able to expand my research to better identify why these economy trajectories looked the way they looked. I found some sources that explained further the real world realities of the fastest growing and the slowest growing economy. It was incredible interesting to see how these GDP rates are affected by natural resources available in these countries. The visualizations of my data summary further expanded on these realities by highlighting these growth rates and was sure to include color indicators to make it more prominent.
