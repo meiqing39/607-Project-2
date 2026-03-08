@@ -46,8 +46,19 @@ Finally, data visualizations will be created using ggplot2, and results will be 
 library (tidyverse) #loads required packages needed for data manipulation such as dplyr, tidyr, readr, lubridate and ggplot2
 
 #Gemini LLM assisted me in loading such a large csv file onto Github repository using Git
+#loading url from github zip link for large csv file
+github_url <- "https://raw.githubusercontent.com/meiqing39/607-Project-2/cbb74bb1c84cef741f9883e92b32ce21ef7078db/openpowerlifting.zip"
 
-raw_powerlifting <- read_csv("openpowerlifting.zip") 
+# Create a temporary file on the user's computer
+temp_file <- tempfile(fileext = ".zip")
+
+# Download the file safely
+download.file(github_url, destfile = temp_file, mode = "wb")
+
+# Read the data into R
+raw_powerlifting <- read_csv(temp_file)
+
+# Display the structure
 
 glimpse(raw_powerlifting)
 
