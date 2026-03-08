@@ -11,6 +11,7 @@ For Project 2, we will be tidying 3 datasets. This file focuses on the Generatio
 ```{r}
 library(tidyr)
 library(dplyr)
+library(ggplot2)
 ```
 
 # Data Source
@@ -25,26 +26,163 @@ To perform an initial inspection of the dataset, we printed the generational_tak
 ```{r}
 generational_takeout
 ```
+# Transformation
+We reshaped the dataset from wide to tidy (long) format. We normalized variable structures and renamed variables to follow a consistent naming convention. We did not have missing or inconsistent values to address.
+```{r}
 
+tidy_gen_takeout <- generational_takeout %>%
+  
+  # Step 1: Reshape from wide to long (tidy) format
+  pivot_longer(
+    cols = -Generation,       # all columns except 'Generation'
+    names_to = "period",      # column names (Jan.25, Feb.25...) go into 'period'
+    values_to = "expenses"    # values go into 'expenses'
+  ) %>%
+ 
+  # Step 2: Split 'period' into month and year, this is part of the normalization process.
+  #\\. is used to escape the '.' and prevent an error in the separate() function; '.' on it's own is a wildcard character 
+  separate(period, into = c("month", "year"), sep = "\\.") %>%
+ 
+   # Step 3: Standardize year to 4 digits and convert Generation to factor
+  mutate(
+    year = paste0("20", year),
+    Generation = as.factor(Generation)
+  ) %>%
+ 
+   # Step 4: Standardize column names manually
+  rename(
+    generation = Generation
+  )
+
+# Preview tidy dataset
+View(tidy_gen_takeout)
+
+```
+
+# Analysis
+We provided two analyses for our dataset. First we wanted to calculate each generation’s percentage of each month's total spending. We loaded tidy_gen_takout into the dataframe gen_monthly_percentage, calculated the percentages then plotted the results in a bar graph and summary table. 
+
+The next analysis calculated the average monthly spending for each generation, over the entire 6-month period. We loaded the tidy_gen_takeout into a dataframe named generation_analysis. We ranked the generations in descending order and plotted the results in a bar graph and summary table for visualization.
+```{r}
+# Generational Share of Monthly Takeout Spending
+
+gen_monthly_percentage <- tidy_gen_takeout %>%
+  group_by(month) %>%                       # group by month
+  mutate(total_month = sum(expenses)) %>%  # total spending across all generations per month
+  ungroup() %>%
+  mutate(percent = round((expenses / total_month) * 100)) %>%  # round to whole %
+  select(generation, month, expenses, percent)
+
+gen_monthly_percentage
+```
+```{r}
+# Month order
+month_levels <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun")
+
+# Convert month column to ordered factor
+gen_monthly_percentage <- gen_monthly_percentage %>%
+  mutate(month = factor(month, levels = month_levels))
+
+ggplot(gen_monthly_percentage, aes(x = month, y = percent, fill = generation)) +
+  geom_bar(stat = "identity", position = "stack") +   # stacked by generation
+  geom_text(aes(label = paste0(percent, "%")),
+            position = position_stack(vjust = 0.5),   # labels inside each bar
+            size = 3) +
+  labs(
+    title = "Generational Percentage of Monthly Takeout Spending",
+    x = "Month",
+    y = "Percentage of Total Monthly Spending (%)",
+    fill = "Generation"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+library(gt)
+
+# 1️⃣ Prepare summary table: months as rows, generations as columns
+summary_table <- gen_monthly_percentage %>%
+  select(month, generation, percent) %>%
+  pivot_wider(names_from = generation, values_from = percent) %>%
+  arrange(match(month, c("Jan","Feb","Mar","Apr","May","Jun")))
+
+# 2️⃣ Create styled summary chart with gt
+summary_table %>%
+  gt() %>%
+  tab_header(
+    title = "Generational Percentages per Month"
+  ) %>%
+  # 3️⃣ Add alternating row colors
+  tab_style(
+    style = list(
+      cell_fill(color = "lightgray")
+    ),
+    locations = cells_body(
+      rows = seq(1, nrow(summary_table), 2)  # every other row
+    )
+  ) %>%
+  # 4️⃣ Optional: center-align text
+  cols_align(
+    align = "center",
+    columns = everything()
+  )
+```
+
+```{r}
+generational_analysis <- tidy_gen_takeout %>%
+
+# 3. Target: Group by Generation
+  group_by(generation) %>%
+
+# 4. Focus: Calculate the Average spending across the months
+  summarise(avg_monthly_spending = round(mean(expenses))) %>%
+  
+# 5. Rank: Order from highest to lowest
+  arrange(desc(avg_monthly_spending))
+ 
+# View the final ranked results
+print(generational_analysis)
+```
 
 ```{r}
 
-# Reshape to tidy format
-tidy_gen_takeout <- generational_takeout |>
+library(ggplot2)
 
-  pivot_longer(
+ggplot(generational_analysis, 
+       aes(x = reorder(generation, avg_monthly_spending),
+           y = avg_monthly_spending, 
+           fill = generation)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0("$", avg_monthly_spending)),
+            vjust = -0.5, size = 4) +
+  labs(
+    title = "Average Monthly Takeout Spending by Generation",
+    x = "Generation",
+    y = "Average Monthly Spending ($)",
+    fill = "Generation"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
 
-    cols      = -id,
+```
 
-    names_to  = "variable",
+```{r}
+library(gt)
 
-    values_to = "value"
-
-  ) |>
-
-  rename_with(tolower) |>
-
-  drop_na()
-
+generational_analysis %>%
+  gt() %>%
+  tab_header(
+    title = "Average Monthly Takeout Spending by Generation"
+  ) %>%
+  cols_align(
+    align = "center",
+    columns = everything()
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "lightgray"),
+    locations = cells_body(
+      rows = seq(1, nrow(generational_analysis), 2)
+    )
+  )
 ```
 
