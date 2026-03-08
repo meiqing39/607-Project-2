@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mei Qi Ng">
+
+<title>Project_2 Powerlifting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Project_2_Powerlifting_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Project_2_Powerlifting_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Project_2_Powerlifting_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Project_2_Powerlifting_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Project_2_Powerlifting_files/libs/quarto-html/popper.min.js"></script>
+<script src="Project_2_Powerlifting_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Project_2_Powerlifting_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Project_2_Powerlifting_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Project_2_Powerlifting_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Project_2_Powerlifting_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Project_2_Powerlifting_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Project_2_Powerlifting_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Project_2 Powerlifting</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Mei Qi Ng </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="approach" class="level2">
+<h2 class="anchored" data-anchor-id="approach">Approach</h2>
+<p>One of the dataset used for project comes from the Open Powerlifting Database on Kaggle, which has competition results across federations, weight classes, and events. Although the dataset is readable, it is not in tidy format. There are several structural issues make it untidy: it is a wide format storage: contains massive amounts of variables spread across many columns. Also the multiple observation unit in 1 row need to be extended.</p>
+</section>
+<section id="tidying-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="tidying-strategy">Tidying Strategy:</h2>
+<ol type="1">
+<li>First I will load the csv file that is uploaded from the Github repository.</li>
+</ol>
+<p><strong>To transform this dataset into tidy format, I will:</strong></p>
+<ol start="2" type="1">
+<li>Identify wide-format columns specifically columns and place the multiple variables in a single name.Reshape from wide to long format. I plan to collapse the many columns into 2 new columns that I will rename.</li>
+</ol>
+<p>Challenges would be working with such a large and wide dataset and also the missing and inconsistent values (0 or negatives) as some competitors may not have attempted all lifts or failed attempt lifts but that will be documented and how these cases are handled.</p>
+</section>
+<section id="planned-analyses" class="level2">
+<h2 class="anchored" data-anchor-id="planned-analyses">Planned Analyses</h2>
+<p>After tidying is complete, I plan to perform several analyses based on the tidy dataset:</p>
+<ol type="1">
+<li><p><strong>Performance differences by sex:</strong> Use boxplots to compare lift performance between male and female competitors.</p></li>
+<li><p><strong>Lift strength relative to body weight:</strong> Group by weight class to examine strength differences and compare.</p></li>
+<li><p><strong>Trends over time:</strong> Analyzing maximum recorded lifts across years to observe how world-record-level lifts have progressed.</p></li>
+</ol>
+<p>Finally, data visualizations will be created using ggplot2, and results will be summarized in tables with clear labeling.</p>
+<p><strong>Resources:</strong></p>
+<ul>
+<li><p><a href="https://r4ds.hadley.nz/">R for Data Science 2nd Editio</a>n</p></li>
+<li><p><a href="https://www.kaggle.com/datasets/open-powerlifting/powerlifting-database?resource=download">Kaggle: Open Powerlifting Data Set</a></p></li>
+<li><p>Google. (2026). *Gemini* [Large language model]. https://gemini.google.com. Accessed March 7th, 2026</p></li>
+</ul>
+</section>
+<section id="loading-packages-and-data-set" class="level1">
+<h1><strong>Loading packages and data set</strong></h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span> (tidyverse) <span class="co">#loads required packages needed for data manipulation such as dplyr, tidyr, readr, lubridate and ggplot2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.6
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.1     ✔ tibble    3.3.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.2
+✔ purrr     1.2.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Gemini LLM assisted me in loading such a large csv file onto Github repository using Git</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>raw_powerlifting <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"openpowerlifting.zip"</span>) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1423354 Columns: 37
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (14): Name, Sex, Event, Equipment, AgeClass, Division, WeightClassKg, P...
+dbl  (22): Age, BodyweightKg, Squat1Kg, Squat2Kg, Squat3Kg, Squat4Kg, Best3S...
+date  (1): Date
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(raw_powerlifting)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,423,354
+Columns: 37
+$ Name            &lt;chr&gt; "Abbie Murphy", "Abbie Tuong", "Ainslee Hooper", "Amy …
+$ Sex             &lt;chr&gt; "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F",…
+$ Event           &lt;chr&gt; "SBD", "SBD", "B", "SBD", "SBD", "SBD", "SBD", "SBD", …
+$ Equipment       &lt;chr&gt; "Wraps", "Wraps", "Raw", "Wraps", "Wraps", "Wraps", "W…
+$ Age             &lt;dbl&gt; 29, 29, 40, 23, 45, 37, 23, 35, 36, 37, 34, 27, 27, 38…
+$ AgeClass        &lt;chr&gt; "24-34", "24-34", "40-44", "20-23", "45-49", "35-39", …
+$ Division        &lt;chr&gt; "F-OR", "F-OR", "F-OR", "F-OR", "F-OR", "F-OR", "F-OR"…
+$ BodyweightKg    &lt;dbl&gt; 59.8, 58.5, 55.4, 60.0, 104.0, 74.0, 59.8, 80.4, 108.0…
+$ WeightClassKg   &lt;chr&gt; "60", "60", "56", "60", "110", "75", "60", "82.5", "11…
+$ Squat1Kg        &lt;dbl&gt; 80.0, 100.0, NA, -105.0, 120.0, 127.5, 115.0, 120.0, 1…
+$ Squat2Kg        &lt;dbl&gt; 92.5, 110.0, NA, -105.0, 130.0, 135.0, 125.0, 130.0, 2…
+$ Squat3Kg        &lt;dbl&gt; 105.0, 120.0, NA, 105.0, 140.0, 142.5, -135.0, 140.0, …
+$ Squat4Kg        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ Best3SquatKg    &lt;dbl&gt; 105.0, 120.0, NA, 105.0, 140.0, 142.5, 125.0, 140.0, 2…
+$ Bench1Kg        &lt;dbl&gt; 45.0, 55.0, 27.5, 67.5, 70.0, 72.5, 65.0, 67.5, 90.0, …
+$ Bench2Kg        &lt;dbl&gt; 50.0, 62.5, 32.5, 72.5, 75.0, 77.5, 70.0, 72.5, 100.0,…
+$ Bench3Kg        &lt;dbl&gt; 55.0, 67.5, -35.0, -75.0, 80.0, 82.5, -75.0, 77.5, NA,…
+$ Bench4Kg        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ Best3BenchKg    &lt;dbl&gt; 55.0, 67.5, 32.5, 72.5, 80.0, 82.5, 70.0, 77.5, 100.0,…
+$ Deadlift1Kg     &lt;dbl&gt; 110.0, 130.0, NA, 132.5, 150.0, 125.0, 130.0, 125.0, 2…
+$ Deadlift2Kg     &lt;dbl&gt; 120.0, 140.0, NA, -140.0, 160.0, 135.0, 140.0, 140.0, …
+$ Deadlift3Kg     &lt;dbl&gt; 130.0, 145.0, NA, -140.0, 170.0, 145.0, 150.0, 152.5, …
+$ Deadlift4Kg     &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ Best3DeadliftKg &lt;dbl&gt; 130.0, 145.0, NA, 132.5, 170.0, 145.0, 150.0, 152.5, 2…
+$ TotalKg         &lt;dbl&gt; 290.0, 332.5, 32.5, 310.0, 390.0, 370.0, 345.0, 370.0,…
+$ Place           &lt;chr&gt; "4", "2", "1", "3", "3", "5", "1", "5", "1", "1", "2",…
+$ Wilks           &lt;dbl&gt; 324.16, 378.07, 38.56, 345.61, 321.25, 354.74, 385.63,…
+$ McCulloch       &lt;dbl&gt; 324.16, 378.07, 38.56, 345.61, 338.91, 354.74, 385.63,…
+$ Glossbrenner    &lt;dbl&gt; 286.42, 334.16, 34.12, 305.37, 274.56, 312.20, 340.74,…
+$ IPFPoints       &lt;dbl&gt; 511.15, 595.65, 313.97, 547.04, 550.08, 596.18, 612.23…
+$ Tested          &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ Country         &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "Austr…
+$ Federation      &lt;chr&gt; "GPC-AUS", "GPC-AUS", "GPC-AUS", "GPC-AUS", "GPC-AUS",…
+$ Date            &lt;date&gt; 2018-10-27, 2018-10-27, 2018-10-27, 2018-10-27, 2018-…
+$ MeetCountry     &lt;chr&gt; "Australia", "Australia", "Australia", "Australia", "A…
+$ MeetState       &lt;chr&gt; "VIC", "VIC", "VIC", "VIC", "VIC", "VIC", "VIC", "VIC"…
+$ MeetName        &lt;chr&gt; "Melbourne Cup", "Melbourne Cup", "Melbourne Cup", "Me…</code></pre>
+</div>
+</div>
+</section>
+<section id="reshaping-and-tidy-large-data" class="level1">
+<h1><strong>Reshaping and tidy large data</strong></h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#wide to long format and use columns that shows competitors attempts</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tidy_powerlift <span class="ot">&lt;-</span> raw_powerlifting <span class="sc">|&gt;</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">matches</span>(<span class="st">"Squat|Bench|Deadlift)[1-4]Kg"</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"lift_type"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"lift_kg"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#everything to lowercase, easier to work with and consistent, remove missing values and negative values (failed lifts)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(tolower) <span class="sc">|&gt;</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">drop_na</span>(lift_kg) <span class="sc">|&gt;</span> </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(lift_kg <span class="sc">&gt;</span><span class="dv">0</span>)  <span class="co">#keep successful lifts</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(tidy_powerlift)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 4,051,475
+Columns: 29
+$ name            &lt;chr&gt; "Abbie Murphy", "Abbie Murphy", "Abbie Murphy", "Abbie…
+$ sex             &lt;chr&gt; "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F",…
+$ event           &lt;chr&gt; "SBD", "SBD", "SBD", "SBD", "SBD", "SBD", "SBD", "SBD"…
+$ equipment       &lt;chr&gt; "Wraps", "Wraps", "Wraps", "Wraps", "Wraps", "Wraps", …
+$ age             &lt;dbl&gt; 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29…
+$ ageclass        &lt;chr&gt; "24-34", "24-34", "24-34", "24-34", "24-34", "24-34", …
+$ division        &lt;chr&gt; "F-OR", "F-OR", "F-OR", "F-OR", "F-OR", "F-OR", "F-OR"…
+$ bodyweightkg    &lt;dbl&gt; 59.8, 59.8, 59.8, 59.8, 59.8, 59.8, 59.8, 59.8, 58.5, …
+$ weightclasskg   &lt;chr&gt; "60", "60", "60", "60", "60", "60", "60", "60", "60", …
+$ deadlift1kg     &lt;dbl&gt; 110.0, 110.0, 110.0, 110.0, 110.0, 110.0, 110.0, 110.0…
+$ deadlift2kg     &lt;dbl&gt; 120, 120, 120, 120, 120, 120, 120, 120, 140, 140, 140,…
+$ deadlift3kg     &lt;dbl&gt; 130, 130, 130, 130, 130, 130, 130, 130, 145, 145, 145,…
+$ deadlift4kg     &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ best3deadliftkg &lt;dbl&gt; 130.0, 130.0, 130.0, 130.0, 130.0, 130.0, 130.0, 130.0…
+$ totalkg         &lt;dbl&gt; 290.0, 290.0, 290.0, 290.0, 290.0, 290.0, 290.0, 290.0…
+$ place           &lt;chr&gt; "4", "4", "4", "4", "4", "4", "4", "4", "2", "2", "2",…
+$ wilks           &lt;dbl&gt; 324.16, 324.16, 324.16, 324.16, 324.16, 324.16, 324.16…
+$ mcculloch       &lt;dbl&gt; 324.16, 324.16, 324.16, 324.16, 324.16, 324.16, 324.16…
+$ glossbrenner    &lt;dbl&gt; 286.42, 286.42, 286.42, 286.42, 286.42, 286.42, 286.42…
+$ ipfpoints       &lt;dbl&gt; 511.15, 511.15, 511.15, 511.15, 511.15, 511.15, 511.15…
+$ tested          &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ country         &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+$ federation      &lt;chr&gt; "GPC-AUS", "GPC-AUS", "GPC-AUS", "GPC-AUS", "GPC-AUS",…
+$ date            &lt;date&gt; 2018-10-27, 2018-10-27, 2018-10-27, 2018-10-27, 2018-…
+$ meetcountry     &lt;chr&gt; "Australia", "Australia", "Australia", "Australia", "A…
+$ meetstate       &lt;chr&gt; "VIC", "VIC", "VIC", "VIC", "VIC", "VIC", "VIC", "VIC"…
+$ meetname        &lt;chr&gt; "Melbourne Cup", "Melbourne Cup", "Melbourne Cup", "Me…
+$ lift_type       &lt;chr&gt; "Squat1Kg", "Squat2Kg", "Squat3Kg", "Best3SquatKg", "B…
+$ lift_kg         &lt;dbl&gt; 80.0, 92.5, 105.0, 105.0, 45.0, 50.0, 55.0, 55.0, 100.…</code></pre>
+</div>
+</div>
+</section>
+<section id="narrowing-down-to-a-smaller-dataset-usa" class="level1">
+<h1><strong>Narrowing down to a smaller dataset: USA</strong></h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Filtering to work with USA powerlifting competitors and specifc columns</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>tidy_USA_powerlift <span class="ot">&lt;-</span> tidy_powerlift <span class="sc">|&gt;</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">==</span> <span class="st">"USA"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">select</span>(name, sex, age, bodyweightkg,country,date,lift_type, lift_kg)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(tidy_USA_powerlift) <span class="co">#look at total columns</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 245,100
+Columns: 8
+$ name         &lt;chr&gt; "Brett Worland", "Brett Worland", "Brett Worland", "Micha…
+$ sex          &lt;chr&gt; "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M", "M…
+$ age          &lt;dbl&gt; 23, 23, 23, 19, 19, 19, 19, 19, 19, 19, 30, 30, 30, 30, 3…
+$ bodyweightkg &lt;dbl&gt; 98.1, 98.1, 98.1, 69.9, 69.9, 69.9, 69.9, 69.9, 69.9, 69.…
+$ country      &lt;chr&gt; "USA", "USA", "USA", "USA", "USA", "USA", "USA", "USA", "…
+$ date         &lt;date&gt; 2015-05-19, 2015-05-19, 2015-05-19, 2013-06-14, 2013-06-…
+$ lift_type    &lt;chr&gt; "Bench1Kg", "Bench2Kg", "Best3BenchKg", "Squat1Kg", "Squa…
+$ lift_kg      &lt;dbl&gt; 185.0, 195.0, 195.0, 140.0, 145.0, 152.5, 152.5, 87.5, 95…</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tidy_USA_powerlift, <span class="dv">6</span>) <span class="co">#look at first 6 rows </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 8
+  name             sex     age bodyweightkg country date       lift_type lift_kg
+  &lt;chr&gt;            &lt;chr&gt; &lt;dbl&gt;        &lt;dbl&gt; &lt;chr&gt;   &lt;date&gt;     &lt;chr&gt;       &lt;dbl&gt;
+1 Brett Worland    M        23         98.1 USA     2015-05-19 Bench1Kg     185 
+2 Brett Worland    M        23         98.1 USA     2015-05-19 Bench2Kg     195 
+3 Brett Worland    M        23         98.1 USA     2015-05-19 Best3Ben…    195 
+4 Michael Hamilton M        19         69.9 USA     2013-06-14 Squat1Kg     140 
+5 Michael Hamilton M        19         69.9 USA     2013-06-14 Squat2Kg     145 
+6 Michael Hamilton M        19         69.9 USA     2013-06-14 Squat3Kg     152.</code></pre>
+</div>
+</div>
+<section id="analyses-performance-differences-lift-strength-trends" class="level2">
+<h2 class="anchored" data-anchor-id="analyses-performance-differences-lift-strength-trends"><strong>Analyses: Performance differences, Lift strength, Trends</strong></h2>
+</section>
+</section>
+<section id="analysis-1-performance-difference-male-vs-female" class="level1">
+<h1><strong>Analysis 1: Performance difference (Male vs Female)</strong></h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Performance difference by Sex Table</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>PxS_table <span class="ot">&lt;-</span>tidy_USA_powerlift <span class="sc">|&gt;</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, lift_type) <span class="sc">|&gt;</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_lift =</span> <span class="fu">round</span>(<span class="fu">mean</span>(lift_kg), <span class="dv">0</span>),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_lift =</span> <span class="fu">max</span>(lift_kg))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'sex'. You can override using the `.groups`
+argument.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(PxS_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 4
+# Groups:   sex [2]
+   sex   lift_type    avg_lift max_lift
+   &lt;chr&gt; &lt;chr&gt;           &lt;dbl&gt;    &lt;dbl&gt;
+ 1 F     Bench1Kg           76     230 
+ 2 F     Bench2Kg           82     242.
+ 3 F     Bench3Kg           88     248.
+ 4 F     Bench4Kg           87     250 
+ 5 F     Best3BenchKg       80     272.
+ 6 F     Best3SquatKg      137     388.
+ 7 F     Squat1Kg          128     350 
+ 8 F     Squat2Kg          136     370.
+ 9 F     Squat3Kg          141     365 
+10 F     Squat4Kg          137     378.
+11 M     Bench1Kg          162     468.
+12 M     Bench2Kg          170     488.
+13 M     Bench3Kg          175     479.
+14 M     Bench4Kg          182     488.
+15 M     Best3BenchKg      168     488.
+16 M     Best3SquatKg      241     574.
+17 M     Squat1Kg          235     522.
+18 M     Squat2Kg          248     530 
+19 M     Squat3Kg          254     560 
+20 M     Squat4Kg          214     467.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare lifts between sex: Boxplot </span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>tidy_USA_powerlift <span class="sc">|&gt;</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>( <span class="at">x =</span> sex, <span class="at">y =</span> lift_kg, <span class="at">fill =</span> sex))<span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()<span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>lift_type)<span class="sc">+</span> <span class="co">#compare all kinds of lifts</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>( <span class="at">title =</span> <span class="st">"Lift Perfomance Differences between Sex"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="st">"Sex"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="st">"Weight lifted (kg)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Project_2_Powerlifting_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Interpretation: The table and the box plot shows the performance differences between Male vs Female weight lifting competitors across 3 different weight lifting events. I expected male lifters to lift heavier on average and in max lifting than females in the all lifting events. This was revealed clearly in the boxplot. In additon, there is also a larger variance in strength level for male competitors than females; it is more apparent in the Squat competitions.</strong></p>
+</section>
+<section id="analysis-2-lift-strength-relative-to-body-weight" class="level1">
+<h1><strong>Analysis 2: lift strength relative to body weight</strong></h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#How many times their own body weight can a powerlifter competitor lift?</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>strength_table <span class="ot">&lt;-</span> tidy_USA_powerlift <span class="sc">|&gt;</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">bw_multiplier =</span> lift_kg<span class="sc">/</span>bodyweightkg) <span class="sc">|&gt;</span> </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, lift_type) <span class="sc">|&gt;</span> </span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">avg_times =</span> <span class="fu">round</span>(<span class="fu">mean</span>(bw_multiplier, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="dv">0</span>))</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(strength_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 3
+# Groups:   sex [2]
+   sex   lift_type    avg_times
+   &lt;chr&gt; &lt;chr&gt;            &lt;dbl&gt;
+ 1 F     Bench1Kg             1
+ 2 F     Bench2Kg             1
+ 3 F     Bench3Kg             1
+ 4 F     Bench4Kg             1
+ 5 F     Best3BenchKg         1
+ 6 F     Best3SquatKg         2
+ 7 F     Squat1Kg             2
+ 8 F     Squat2Kg             2
+ 9 F     Squat3Kg             2
+10 F     Squat4Kg             2
+11 M     Bench1Kg             2
+12 M     Bench2Kg             2
+13 M     Bench3Kg             2
+14 M     Bench4Kg             2
+15 M     Best3BenchKg         2
+16 M     Best3SquatKg         3
+17 M     Squat1Kg             3
+18 M     Squat2Kg             3
+19 M     Squat3Kg             3
+20 M     Squat4Kg             3</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatterplot to compare body weight of competitors to how much weight they can lift</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>tidy_USA_powerlift<span class="sc">|&gt;</span> </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>( <span class="at">x =</span> bodyweightkg, <span class="at">y =</span> lift_kg, <span class="at">color =</span> sex))<span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.2</span>)<span class="sc">+</span> <span class="co"># create transparent dots to see clusters of M vs F more clearly</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>lift_type)<span class="sc">+</span>   </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Lift Strength to Body Weight"</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Competitor Weight (kg)"</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Weight lifted (kg)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Project_2_Powerlifting_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Intepretation: When analyzing the lift strength to the competitor’s body weight, the scatter plot demonstrates a positive correlation of increase lifter’s body weight mean increase weight that they can lift. However, the table provides more information by calculating the average bodyweight multiplier. This is incredibly interesting to see and compare: while heavier power lifters lift more total weight, lighter power lifters often move a higher multiple of their own body weight which reveals very strong relative strength to their weight.</strong></p>
+</section>
+<section id="analysis-3-trend-over-time" class="level1">
+<h1><strong>Analysis 3: Trend over time</strong></h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trend table</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>TT_table <span class="ot">&lt;-</span> tidy_USA_powerlift <span class="sc">|&gt;</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(date)) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, lift_type) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_lift =</span> <span class="fu">max</span>(lift_kg)) <span class="sc">|&gt;</span> </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(year))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'year'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(TT_table, <span class="dv">9</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 3
+# Groups:   year [1]
+   year lift_type    max_lift
+  &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;
+1  2019 Bench1Kg         425 
+2  2019 Bench2Kg         455 
+3  2019 Bench3Kg         372.
+4  2019 Bench4Kg         203 
+5  2019 Best3BenchKg     455 
+6  2019 Best3SquatKg     490 
+7  2019 Squat1Kg         465 
+8  2019 Squat2Kg         460 
+9  2019 Squat3Kg         490 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract Year and find max lift per year</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>tidy_USA_powerlift<span class="sc">|&gt;</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(date)) <span class="sc">|&gt;</span> <span class="co">#extracts date/time *R for datascience Chapter 17*</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, lift_type)<span class="sc">|&gt;</span> </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_weight_lift =</span> <span class="fu">max</span>(lift_kg)) <span class="sc">|&gt;</span> </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>( <span class="at">x =</span> year, <span class="at">y =</span> max_weight_lift, <span class="at">color =</span> lift_type))<span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>()<span class="sc">+</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Competition Max Lifts over Time"</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Lift Type"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'year'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Project_2_Powerlifting_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Interpretation:</strong> By extracting the year from the competition dates, we can track the progression of the highest weight lifted by the power lifters. The line graph and table shows the maximum lifts over the years. I can see how power lifters in the US attempts in all lift type are trending upwards which makes sense since for these althetes over the years with experience, they probably made improvements in their training methods, nutrition,and using better lifting equipment.</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>The goal of this project was to transform a wide, untidy dataset into a tidy format that can be used for analysis. By using the pivot_longer() function in tidyr, the OpenPowerlifting dataset was successfully reshaped, collapsing over a dozen horizontal lift attempt columns into standardized lift_type and lift_kg variables. The challenge for me was trying to find a way to upload this large csv data set probably as Github would not accept files larger than 100MB. By using Gemini Pro as a assistant, I was able to bypass this by zip filing and using Git Bash to push and commit the csv file on to the main repository. In additon, while working with such a large datase, I notice there were many missing and failed (negative values) attempts. By using the drop.na functions and filtering those values out, as well as selecting only the variable columns I am interested in, I was able to create a clean dataset that was ready to be utilized for exploratory planned analyses.</p>
+<p>Working on the tidy data, the analysis I performed regarding the powerlifting listed:</p>
+<p>Performance Differences (Sex): There is apparent variance in strength between sexes, with males recording higher average lifts across all events (ex: an average bench(1kg) of 162 kg compared to 76 kg for females).</p>
+<p>Strength to bodyweight: While weight lifted increases with body weight as I predicted, I analyzed the bodyweight multiplier and it revealed that lighter lifters often have exceptional strength, moving higher multiples of their own body weight.</p>
+<p>Trends over time: There is a clear upward trajectory of the maximum lifts over the years in the power lifting sport in the USA competition, which reflects the advancements in strength training and athlete preparation.</p>
+<p>Ultimately, this process help me understand how important data tidying was when using a large and messy data set. The wide format made creating tables and data plot visualizations very difficult as there were too many variables to work with. However, the tidy and long format allowed for better statistical grouping, easier spotting of patterns in the tables, and creating straight forward graphs.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
