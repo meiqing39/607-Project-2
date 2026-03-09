@@ -6,9 +6,10 @@ editor: source
 ---
 
 # Approach 
-For Project 2, we will be tidying 3 datasets. This file focuses on the Generational Takeout Spending dataset. We will import the wide-format CSV file from GitHub into R and transform it into a tidy structure using the tidyr and dplyr packages. We will reshape the generational spending columns into a long format using functions such as pivot_longer(), then standardize column names with rename_with() and handle any missing or inconsistent values using functions like drop_na() to prepare the data for analysis. Finally, we will analyze trends in takeout spending across generations and visualize the results using ggplot2, though a potential challenge may be restructuring the generational columns correctly during the wide-to-long transformation.
+For Project 2, we will be tidying 3 datasets. This file focuses on the Generational Takeout Spending dataset. We will import the wide-format CSV file from GitHub into R and transform it into a tidy structure using the tidyr and dplyr packages from tidyverse. We will reshape the generational spending columns into a long format using functions such as pivot_longer(), then standardize column names with rename_with(). Our dataset did not contain any missing or inconsistent values so we did not need to use functions such as drop_na() to prepare the data for analysis. Finally, we will analyze trends in takeout spending across generations and visualize the results using ggplot2, though a potential challenge may be restructuring the generational columns correctly during the wide-to-long transformation.
 
 ```{r}
+library(tidyverse)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
@@ -57,6 +58,7 @@ tidy_gen_takeout <- generational_takeout %>%
 
 # Preview tidy dataset
 View(tidy_gen_takeout)
+print(tidy_gen_takeout)
 
 ```
 
@@ -216,3 +218,8 @@ The generational percentage of total monthly spending analysis shows Millennials
 The average monthly spending analysis by generation supports these findings by showing Millennials spend the most, with an average monthly takeout expenditure of approximately \$257, followed by Gen X at \$206 and Gen Z at roughly \$199. Baby Boomers were in fourth with an average of \$131, while the Silent Generation had the lowest monthly average at \$82 per month, \$175 less, per month, than the highest spender. 
 
 Overall, the analyses presented in the visualizations and summary tables highlight multiple generational differences in spending behavior. Approximately 75% of monthly takeout spending is done by the younger three generations, though Millenials, who are in the middle of the three, account for 30%, a disproportionately large amount. The data also shows an interesting trend where Gen X and Gen Z are spending almost on par each month, though there's a generation between them. Gen X is often the parent of Gen Z, so it could be informative to explore their spending habits deeper. The older generations, Baby Boomers and the Silent Generation spending the lowest amounts was expected though. 
+
+#Citation
+
+(Google DeepMind). (2026). Gemini pRO [Large language model]. 
+https://gemini.google.com. Accessed March 7th, 2026. 
